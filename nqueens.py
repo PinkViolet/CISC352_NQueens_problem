@@ -28,8 +28,6 @@ def write_output_file(pendingStr):
         f.write(pendingStr)
 
 #def initialization() #start the program
-
-
 '''
 Takes in the y coordinates and returns the number of conflicts based on the x coordinate
 forward diagnol conflicts are respective piece (the first value is piece with x value of 1, etc etc
@@ -54,11 +52,7 @@ def check_conflict(table):
         conflict_backward.append(backwardDiagnol.count(y)-1)
     totalConflicts = list(map(operator.add, conflict_y, conflict_forward))
     totalConflicts = list(map(operator.add, totalConflicts, conflict_backward))
-    return (totalConflicts)
-    
-
-    
-      
+    return (totalConflicts)      
         
 
 def place_queen(table_size): # can be used for restart
@@ -66,9 +60,49 @@ def place_queen(table_size): # can be used for restart
     random.shuffle(yCoord)
     return yCoord
 
-#def move_queen()
 
-table_size = 10
+
+'''
+find how many conflict the point (col, row) has with Queens
+'''
+def check_conflict_in_spot(table, row, col):
+    count = 0
+    queen_x = 1
+    for queen in table:
+        #print("queen: (" + str(queen_x) + ", " + str(queen) + ")\n")
+        #print("spot: (" + str(col) + ", " + str(row) + ")\n")
+        #print("before count conflict: " + str(count) + "\n")
+        if col != queen_x:
+            if row == queen:
+                count = count + 1
+            if row - col == queen - queen_x:
+                count = count + 1
+            if row + col == queen + queen_x:
+                count = count + 1
+        queen_x = queen_x + 1
+        #print("after count conflict: " + str(count) + "\n")
+    return count
+
+'''
+for each column calculate the conflict the point
+(C, Ri) has for every i in range(1, table size + 1)
+and form a list contain the spot with minimun conflict
+and randomly choose a spot to place queen
+'''
+def move_queen(table, target_col):
+    possible_place = []
+    min_conflict = len(table)
+    for row in range(1, len(table) + 1):
+        c = check_conflict_in_spot(table, row, target_col)
+        if c == min_conflict:
+            possible_place.append(row)
+        elif c < min_conflict:
+            possible_place = [row]
+            min_conflict = c
+    table[target_col - 1] = random.choice(possible_place)
+    return table
+
+#table_size = len(table)
 
 #table = [] # x is index [y]
 
@@ -81,12 +115,17 @@ outputFile = "nqueens_out.txt"
 
 
 def main():
+    
 #    list_of_TS = get_input_file()
-    table = place_queen(10)
+#   table = place_queen(5)
+    table = [2, 5, 4, 3, 1]
     print(table)
-    write_output_file(outputPendingFile(table))
-    Conflicts = check_conflict(table)
-    print(Conflicts)
+    print(check_conflict(table))
+    print(move_queen(table, 1))
+    #write_output_file(outputPendingFile(table))
+    
+    
+
     return
 
 
