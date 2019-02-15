@@ -25,7 +25,7 @@ def outputPendingFile(table):
 def write_output_file(pendingStr):
     global outputFile
     with open(outputFile, "a") as f:
-        f.write(pendingStr)
+        f.write(pendingStr + "\n")
 
 #def initialization() #start the program
 '''
@@ -68,11 +68,15 @@ find how many conflict the point (col, row) has with Queens
 def check_conflict_in_spot(table, row, col):
     count = 0
     queen_x = 1
+    #print("table in check spot: ")
+    #print(table)
     for queen in table:
         #print("queen: (" + str(queen_x) + ", " + str(queen) + ")\n")
         #print("spot: (" + str(col) + ", " + str(row) + ")\n")
         #print("before count conflict: " + str(count) + "\n")
         if col != queen_x:
+            #print("(col, row) = (" + str(col) + ", " + str(row) + ")")
+            #print("(queen_x, queen) = (" + str(queen_x) + ", " + str(queen) + ")")
             if row == queen:
                 count = count + 1
             if row - col == queen - queen_x:
@@ -93,12 +97,20 @@ def move_queen(table, target_col):
     possible_place = []
     min_conflict = len(table)
     for row in range(1, len(table) + 1):
+        #print("col: " + str(target_col))
         c = check_conflict_in_spot(table, row, target_col)
         if c == min_conflict:
             possible_place.append(row)
         elif c < min_conflict:
             possible_place = [row]
             min_conflict = c
+#    print("possible_place: ")
+#    print(possible_place)
+#    print("\n")
+#    print("target_col in move queen: " + str(target_col))
+#    print("\ntable in move queen: ")
+#    print(table)
+#    print("target col - 1: " + str(target_col - 1))
     table[target_col - 1] = random.choice(possible_place)
     return table
 
@@ -112,21 +124,71 @@ inputFile = "nqueens.txt"
 
 outputFile = "nqueens_out.txt"
 
-
+def find_queen_to_swap(table, col):
+    target_row = table[col - 1]
+    x = 1
+    for y in table:
+#        print("index x: " + str(x))
+        if target_row == y and x != col:
+            return x
+        else:
+            x = x + 1
+    #return col
+    
 
 def main():
-    
-#    list_of_TS = get_input_file()
-#   table = place_queen(5)
+    '''
+    # best table = [5,2,4,1,3]
     table = [2, 5, 4, 3, 1]
+    swap_queen_col = 1
+    print("table before: ")
     print(table)
-    print(check_conflict(table))
-    print(move_queen(table, 1))
-    #write_output_file(outputPendingFile(table))
-    
-    
+    print("\n")
+    table = move_queen(table, swap_queen_col)
+    print("table after move: ")
+    print(table)
+    print("\n")
+    print("the next col to swap: " + str(find_queen_to_swap(table, swap_queen_col)))
+    '''
 
+    
+    list_of_TS = get_input_file()
+    #print(list_of_TS)
+    for i in list_of_TS:
+        table = place_queen(i)
+
+        #table = [2, 5, 4, 3, 1]
+        check_status = False
+        num_conflict = 0
+        swap_queen_col = random.randint(1, len(table) + 1)
+        #print(swap_queen_col)
+        list_conflict = check_conflict(table)
+        #print("list_conflict: ")
+        #print(list_conflict)
+        #print("\n")
+        
+        while (check_status == False):
+            for c in list_conflict:
+                num_conflict = num_conflict + c
+            if num_conflict != 0:
+                table = move_queen(table, swap_queen_col)
+                list_conflict = check_conflict(table)
+                if list_conflict[swap_queen_col - 1] == 0:
+                    swap_queen_col = random.randint(1, len(table))
+                else:
+                    swap_queen_col = find_queen_to_swap(table, swap_queen_col)
+            else:
+                check_status == True
+        #print("result table: ")
+        print(table)
+        #print("\n")
+    
     return
+
+#        write_output_file(outputPendingFile(table))
+
+
+
 
 
 
